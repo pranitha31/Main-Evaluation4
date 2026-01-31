@@ -10,9 +10,10 @@ exports.createTrip = async (req, res) => {
     .select('*')
     .eq('id',customer_id)
     .single();
-    if (!customer || customer.role !== 'customer){
+    if (!customer || customer.role !== 'customer) 
+    {
         return res.status(404).json({ error: 'only customer can create a trip' });    
-    } 
+    }
     const {data:vehicle}=await supabase{
     .from('vehicles')
     .select('*')
@@ -29,5 +30,30 @@ exports.createTrip = async (req, res) => {
     if (error) return res.status(500).json({error:error.message});  
     
     await.status(201).json({message:'trip created successfully',trip:data[0]});
+    res.status(201).json({message:'trip created successfully',trip:data[0]});
+};
+exports.updateTrip = async (req, res) => {
+    const { tripId } = req.params;
+    const { data, error } = await supabase
+        .from('trips')
+        .update(req.body)
+        .eq('id', tripId);
+    if (error) return res.status(500).json({ error: error.message });
+    res.json({ message: 'trip updated successfully', trip: data[0] });
+};
+exports.endTrip = async (req, res) => {
+    const { tripId } = req.params;
 
+    const { data, error } = await supabase
+        .from('trips')
+        .update({ end_date: new Date() })
+        .eq('id', tripId);
+
+    if (error) return res.status(400).json({ error:error.message});
+
+    await supabase.from('vehicles')
+        .update({ available: true })
+        .eq('id', data[0].vehicle_id);
+
+    res.json({ message: 'trip ended successfully', trip: data[0] });
 };
