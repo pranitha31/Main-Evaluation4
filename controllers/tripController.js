@@ -10,7 +10,7 @@ exports.createTrip = async (req, res) => {
     .select('*')
     .eq('id',customer_id)
     .single();
-    if (!customer || customer.role !== 'customer) 
+    if (!customer || customer.role !== 'customer') 
     {
         return res.status(404).json({ error: 'only customer can create a trip' });    
     }
